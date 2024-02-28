@@ -21,6 +21,7 @@ import zipfile
 from pathlib import Path
 from typing import Callable, Optional, Tuple, Union
 import imageio
+import random
 
 import click
 import numpy as np
@@ -68,8 +69,10 @@ def is_image_ext(fname: Union[str, Path]) -> bool:
 #----------------------------------------------------------------------------
 
 def open_image_folder(source_dir, *, max_images: Optional[int]):
-    input_images = [str(f) for f in sorted(Path(source_dir).rglob('*')) if is_image_ext(f) and os.path.isfile(f)]
+    # input_images = [str(f) for f in sorted(Path(source_dir).rglob('*')) if is_image_ext(f) and os.path.isfile(f)] # Create and Sort image paths()
 
+    input_images = [str(f) for f in Path(source_dir).rglob('*') if is_image_ext(f)]        # Create image paths list
+    random.shuffle(input_images)                                            # Randomize image paths
     # Load labels.
     labels = {}
     meta_fname = os.path.join(source_dir, 'dataset.json')
@@ -97,9 +100,12 @@ def open_image_folder(source_dir, *, max_images: Optional[int]):
 #----------------------------------------------------------------------------
 
 def open_image_zip(source, *, max_images: Optional[int]):
-    with zipfile.ZipFile(source, mode='r') as z:
-        input_images = [str(f) for f in sorted(z.namelist()) if is_image_ext(f)]
-
+    with zipfile.ZipFile(source, mode='r') as z:        
+        # input_images = [str(f) for f in sorted(z.namelist()) if is_image_ext(f)]  # Sort image paths()
+        
+        input_images = [str(f) for f in z.namelist() if is_image_ext(f)]        # Create image paths list
+        random.shuffle(input_images)                                            # Randomize image paths
+        
         # Load labels.
         labels = {}
         if 'dataset.json' in z.namelist():
