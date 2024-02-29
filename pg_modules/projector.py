@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import os
 import timm
 from pg_modules.blocks import FeatureFusionBlock
 
@@ -55,12 +56,24 @@ def calc_channels(pretrained, inp_res=224):
 
     return channels
 
+def _create_model(path):
+    if os.path.exists(path):
+        return torch.load(path)
+    else:
+        import wget
+        new_path=wget.download("https://drive.usercontent.google.com/download?id=1--vUp65upnlawolRLIf84dGhbw25PNmI&export=download&confirm=t")
+        
+        return torch.load(new_path)
+
+
 
 def _make_projector(im_res, cout, proj_type, expand=False):
     assert proj_type in [0, 1, 2], "Invalid projection type"
 
     ### Build pretrained feature network
-    model = timm.create_model('tf_efficientnet_lite0', pretrained=True)
+    # model = timm.create_model('tf_efficientnet_lite0', pretrained=True) # pretrained on imagenet
+    model = _create_model('tf_efficientnet_lite0_pretrained.pth')   # pretrained on our dataset
+
     pretrained = _make_efficientnet(model)
 
     # determine resolution of feature maps, this is later used to calculate the number
