@@ -45,13 +45,13 @@ def calc_channels(pretrained, inp_res=224):
     tmp = torch.zeros(1, 3, inp_res, inp_res)
 
     # forward pass
-    tmp = pretrained.layer0(tmp)
+    tmp = pretrained.cpu().layer0(tmp)
     channels.append(tmp.shape[1])
-    tmp = pretrained.layer1(tmp)
+    tmp = pretrained.cpu().layer1(tmp)
     channels.append(tmp.shape[1])
-    tmp = pretrained.layer2(tmp)
+    tmp = pretrained.cpu().layer2(tmp)
     channels.append(tmp.shape[1])
-    tmp = pretrained.layer3(tmp)
+    tmp = pretrained.cpu().layer3(tmp)
     channels.append(tmp.shape[1])
 
     return channels
